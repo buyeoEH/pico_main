@@ -4,122 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌱 스마트 IoT 모니터링</title>
-    <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #f0f4f8; 
-            text-align: center; 
-            padding-top: 50px; 
-            margin: 0;
-        }
-        .dashboard-card { 
-            background: white; 
-            padding: 40px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
-            display: inline-block;
-            min-width: 300px;
-        }
-        h1 { color: #333; margin-top: 0; }
-        .percent-box { 
-            font-size: 60px; 
-            font-weight: 800; 
-            color: #333; 
-            margin: 20px 0; 
-        }
-        .status-box { 
-            font-size: 28px; 
-            font-weight: bold; 
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            transition: color 0.3s;
-        }
-        .raw-data { 
-            font-size: 14px; 
-            color: #888; 
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-            margin-top: 20px;
-        }
-        .loading { color: #aaa; font-style: italic; }
-    </style>
+
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="dashboard-card">
-        <h1>🌱 내 식물 수분 상태</h1>
-        
-        <div id="moisturePercent" class="percent-box loading">--%</div>
-        <div id="moistureStatus" class="status-box">데이터를 불러오는 중...</div>
-        
-        <div class="raw-data">
-            <span id="moistureRaw">센서 원본 값: 대기 중</span>
+
+        <h1>🌱 스마트 IoT 모니터링</h1>
+
+        <div id="moisturePercent" class="percent-box loading">
+            --%
         </div>
+
+        <div id="moistureStatus" class="status-box">
+            데이터를 불러오는 중...
+        </div>
+
+        <div class="sensor-box">
+
+            <div class="sensor-item">
+                <div class="sensor-label">🌡️ 온도</div>
+                <div id="temperature" class="sensor-value">-- ℃</div>
+            </div>
+
+            <div class="sensor-item">
+                <div class="sensor-label">💧 습도</div>
+                <div id="humidity" class="sensor-value">-- %</div>
+            </div>
+
+        </div>
+
+        <div class="raw-data">
+            <span id="moistureRaw">
+                센서 원본 값: 대기 중
+            </span>
+        </div>
+
     </div>
 
-    <script>
-        let dbUrl = "";
+    <script src="script.js"></script>
 
-        // 1. config.txt 파일에서 파이어베이스 주소 불러오기
-        fetch('config.txt')
-            .then(response => {
-                if (!response.ok) throw new Error("config.txt를 찾을 수 없습니다.");
-                return response.text();
-            })
-            .then(text => {
-                // 주소 끝에 /sensorData.json을 붙여서 완성
-                dbUrl = text.trim() + "/sensor_data.json";
-                
-                // 최초 1회 즉시 실행
-                fetchSensorData();
-                // 이후 5초마다 계속 업데이트
-                setInterval(fetchSensorData, 5000);
-            })
-            .catch(error => {
-                document.getElementById('moistureStatus').innerText = "설정 파일 오류 ⚠️";
-                console.error(error);
-            });
-
-        // 2. 파이어베이스에서 실시간 데이터 가져와서 화면에 반영하기
-        function fetchSensorData() {
-            if (!dbUrl) return;
-
-            fetch(dbUrl)
-                .then(res => res.json())
-                .then(data => {
-                    if(data) {
-                        // 데이터 화면에 출력
-                        document.getElementById('moisturePercent').innerText = data.percent + "%";
-                        document.getElementById('moistureRaw').innerText = "센서 원본 값: " + data.raw;
-                        
-                        // 상태 텍스트 및 색상 변경 로직
-                        const statusElement = document.getElementById('moistureStatus');
-                        if(data.status == '1'){
-                            data_status = '건조'
-                        }
-                        else if(data.status == '2'){
-                            data_status = '적정'
-                        }
-                        else{
-                            data_status = '과습'
-                        }
-                        statusElement.innerText = data_status;
-
-                        // 상태에 따라 글자 색상 바꾸기 1:건조 | 2: 적정 | 3: 과습
-                        if (data.status.includes("1")) {
-                            statusElement.style.color = "#FF5252"; // 빨간색 (경고)
-                        } else if (data.status.includes("2")) {
-                            statusElement.style.color = "#4CAF50"; // 초록색 (안정)
-                        } else if (data.status.includes("3")) {
-                            statusElement.style.color = "#2196F3"; // 파란색 (물 많음)
-                        } else {
-                            statusElement.style.color = "#333";
-                        }
-                    }
-                })
-                .catch(error => console.error("데이터 불러오기 실패:", error));
-        }
-    </script>
 </body>
 </html>
