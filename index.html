@@ -69,7 +69,7 @@
             })
             .then(text => {
                 // 주소 끝에 /sensorData.json을 붙여서 완성
-                dbUrl = text.trim() + "/sensorData.json";
+                dbUrl = text.trim() + "/sensor_data.json";
                 
                 // 최초 1회 즉시 실행
                 fetchSensorData();
